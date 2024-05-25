@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+        .hidden { display: none; }
+    </style>
+    <script>
+        async function handleLogin(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+
+            const loader = document.getElementById('loader');
+            const loginButton = document.getElementById('loginButton');
+            loader.classList.remove('hidden');
+            loginButton.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:8080/users/authenticate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.text(); // Capturando texto puro, assumindo resposta como texto plano
+                if (response.ok) {
+                    alert('Login bem-sucedido!');
+                    window.location.href = 'index.html'; // Redireciona para a página principal ou dashboard
+                } else {
+                    alert(result); // Exibe a mensagem de erro do servidor
+                }
+            } catch (error) {
+                alert('Erro ao conectar ao servidor. Tente novamente mais tarde.');
+            } finally {
+                loader.classList.add('hidden');
+                loginButton.disabled = false;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Login</h1>
+    <form onsubmit="handleLogin(event)">
+        <label for="username">Usuário:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="password">Senha:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <button type="submit" id="loginButton">Entrar</button>
+    </form>
+    <div id="loader" class="hidden">Carregando...</div>
+    <button onclick="window.location.href='index.html'">Voltar</button>
+</body>
+</html>
